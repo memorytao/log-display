@@ -1,0 +1,11 @@
+@font-face {
+    font-family: 'NovaMono';
+    src: url('../fonts/NovaMono-Regular.ttf') format('ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+.nova-mono {
+    font-family: 'NovaMono', monospace;
+}

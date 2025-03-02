@@ -2,7 +2,6 @@ import PropTypes from "prop-types";
 import { RESPONSE_FILD, CONTACT_FIELD } from "./../api/fields";
 
 const DisplayResults = ({ csvData, logType }) => {
-
   const COLUMNS =
     logType === "Response History"
       ? RESPONSE_FILD.split("|")
@@ -38,15 +37,15 @@ const DisplayResults = ({ csvData, logType }) => {
   });
 
   return (
-    <div className="overflow-y-scroll rounded-3xl shadow-md dark:shadow-gray-800 max-w-lvw mx-auto">
-      <table className="min-w-full bg-white">
+    <div className="overflow-x-auto h-auto max-h-120 rounded-lg shadow-mdmax-w-lvw mx-auto mb-auto border-b-5 border-b-gray-600 border-r-12 border-r-gray-200 ">
+      <table className="w-96 bg-white mb-auto pb-5">
         {/* Table Header */}
-        <thead className="bg-gray-50 h-15 dark:bg-gray-700 max-h-150">
+        <thead className="h-15 max-h-150 bg-gradient-to-b from-gray-900 to-gray-700">
           <tr>
             {COLUMNS.map((column, index) => (
               <th
                 key={index}
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300"
+                className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300 "
               >
                 {column}
               </th>
@@ -55,12 +54,9 @@ const DisplayResults = ({ csvData, logType }) => {
         </thead>
 
         {/* Table Body */}
-        <tbody className="divide-y divide-gray-200 ">
+        <tbody className="divide-y divide-gray-400  ">
           {rows.map((row, rowIndex) => (
-            <tr
-              key={rowIndex}
-              className="hover:bg-gray-300 transition-colors"
-            >
+            <tr key={rowIndex} className="hover:bg-gray-300 transition-colors">
               {row.map((cell, cellIndex) => (
                 <td
                   key={cellIndex}

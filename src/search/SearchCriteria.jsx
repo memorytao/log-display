@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import DisplayResults from "../display/DisplayResults";
 import { getResponseLogs, getContactLogs } from "../api/getDtacLog";
+import './criteria.css'
 
 const SearchCriteria = () => {
   // State for form inputs
@@ -20,8 +21,7 @@ const SearchCriteria = () => {
   const resetButtonRef = useRef(null);
 
   const handleSelectedLog = (e) => {
-    console.log( 'value ',e.target.value);
-    
+
     setSelectedLog(e.target.value);
     setCsvData("");
   };
@@ -140,20 +140,20 @@ const SearchCriteria = () => {
   };
 
   return (
-    <div className="mx-auto py-8">
+    <div className="w-5/6 mx-auto py-8 rounded-lg nova-mono">
       <form
         onSubmit={(e) => e.preventDefault()} // Prevent default form submission
-        className="bg-white p-6 rounded-lg shadow-md"
+        className="bg-neutral-50 p-6 rounded-2xl shadow-md border border-gray-100"
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-balance font-semibold text-gray-700 ">
               Brand
             </label>
             <select
               value={selectedBrand}
               onChange={(e) => setSelectedBrand(e.target.value)}
-              className=" mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className=" mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="DTAC">DTAC</option>
               <option value="TRUE">TRUE</option>
@@ -162,13 +162,13 @@ const SearchCriteria = () => {
 
           {/* Select Menu */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-balance font-semibold text-gray-700">
               Logs
             </label>
             <select
               value={selectedLog}
               onChange={handleSelectedLog}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="Response History">Response History</option>
               <option value="Contact History">Contact History</option>
@@ -177,14 +177,14 @@ const SearchCriteria = () => {
 
           {/* Status Dropdown */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-balance font-semibold text-gray-700">
               Status
             </label>
             <select
               value={status}
               // placeholder="Select Status"
               onChange={(e) => setStatus(e.target.value)}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select Status</option>
               <option value="FULS">FULS</option>
@@ -194,7 +194,7 @@ const SearchCriteria = () => {
 
           {/* MSISDN Text Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-balance font-semibold text-gray-700">
               MSISDN
             </label>
             <input
@@ -204,26 +204,26 @@ const SearchCriteria = () => {
               value={msisdn}
               onChange={handleMSISDNChange}
               placeholder="eg. 66948078978"
-              className="required:border-red-600 required:border-2 mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="required:border-red-600 required:border-2 mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Date Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-balance font-semibold text-gray-700">
               Date
             </label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Package Text Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-balance font-semibold text-gray-700">
               Package
             </label>
             <input
@@ -231,7 +231,7 @@ const SearchCriteria = () => {
               value={packCode}
               onChange={(e) => setPackage(e.target.value)}
               placeholder="Package Code"
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -243,7 +243,7 @@ const SearchCriteria = () => {
               ref={searchButtonRef}
               onClick={handleSearch}
               disabled={isLoading}
-              type="button" // Use type="button" to prevent form submission
+              type="submit" // Use type="button" to prevent form submission
               className="w-full sm:w-auto px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {isLoading ? "Searching..." : "Search"}
