@@ -69,7 +69,7 @@ const SearchCriteria = () => {
         if (selectedLog === "Response History") {
           data = await getTrueResponseLogs(searchParams); // Use the API function
         } else {
-          data = await getTrueResponseLogs(searchParams); // Use the API function
+          data = await getTrueContactLogs(searchParams); // Use the API function
         }
       }
       setCsvData(data);
