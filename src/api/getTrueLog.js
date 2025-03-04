@@ -1,7 +1,7 @@
 const API_HOST = "http://localhost:8888/";
 const TIMEOUT = 10000;
 
-export const getResponseLogs = async (searchTerm) => {
+export const getTrueResponseLogs = async (searchTerm) => {
   await setTimeout(() => {
     try {
       const response = fetch(`${API_HOST}/apis/true/getResponseLog`, {
@@ -30,7 +30,7 @@ export const getResponseLogs = async (searchTerm) => {
   }, TIMEOUT);
 };
 
-export const getContactLogs = async (searchTerm) => {
+export const getTrueContactLogs = async (searchTerm) => {
   try {
     const response = await fetch(`${API_HOST}/apis/true/getContactLog`, {
       method: "POST",

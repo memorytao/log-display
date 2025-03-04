@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import DisplayResults from "../display/DisplayResults";
-import { getResponseLogs, getContactLogs } from "../api/getDtacLog";
+import { getDtacResponseLogs, getDtacContactLogs } from "../api/getDtacLog";
+import { getTrueResponseLogs, getTrueContactLogs} from "../api/getTrueLog"
 import './criteria.css'
 
 const SearchCriteria = () => {
@@ -53,20 +54,22 @@ const SearchCriteria = () => {
       selectedBrand: selectedBrand,
     };
 
+    console.log('search param :', searchParams);
+    
+
     try {
       let data;
       if (selectedBrand === "DTAC") {
         if (selectedLog === "Response History") {
-          data = await getResponseLogs(searchParams); // Use the API function
+          data = await getDtacResponseLogs(searchParams); // Use the API function
         } else {
-          data = await getContactLogs(searchParams); // Use the API function
+          data = await getDtacContactLogs(searchParams); // Use the API function
         }
-        setCsvData(data);
       } else {
         if (selectedLog === "Response History") {
-          data = await getResponseLogs(searchParams); // Use the API function
+          data = await getTrueResponseLogs(searchParams); // Use the API function
         } else {
-          data = await getContactLogs(searchParams); // Use the API function
+          data = await getTrueResponseLogs(searchParams); // Use the API function
         }
       }
       setCsvData(data);

@@ -1,6 +1,6 @@
 const API_HOST = "http://localhost:8888";
 
-export const getResponseLogs = async (searchTerm) => {
+export const getDtacResponseLogs = async (searchTerm) => {
   try {
     const response = await fetch(`${API_HOST}/apis/dtac/getResponseLog`, {
       method: "POST",
@@ -27,7 +27,7 @@ export const getResponseLogs = async (searchTerm) => {
   }
 };
 
-export const getContactLogs = async (searchTerm) => {
+export const getDtacContactLogs = async (searchTerm) => {
   try {
     const response = await fetch(`${API_HOST}/apis/dtac/getContactLog`, {
       method: "POST",
