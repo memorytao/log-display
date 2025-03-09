@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { RESPONSE_FILD, CONTACT_FIELD } from "./../api/fields";
+import { RESPONSE_FILD, CONTACT_FIELD } from "../utl/Fields";
 
 const DisplayResults = ({ csvData, logType }) => {
   const COLUMNS =
@@ -37,8 +37,8 @@ const DisplayResults = ({ csvData, logType }) => {
   });
 
   return (
-    <div className="overflow-x-auto h-auto max-h-120 rounded-lg shadow-mdmax-w-lvw mx-auto mb-auto border-b-5 border-b-gray-600 border-r-12 border-r-gray-200 ">
-      <table className="w-96 bg-white mb-auto pb-5">
+    <div className="overflow-x-auto max-w-screen-2xl min-w-0 mt-10 h-120 max-h-screen rounded-2xl mx-auto mb-auto border-l-10 border-l-gray-300  border-b-15 border-b-gray-300 border-r-12 border-r-gray-300">
+      <table className="bg-white">
         {/* Table Header */}
         <thead className="h-15 max-h-150 bg-gradient-to-b from-gray-900 to-gray-700">
           <tr>
@@ -54,17 +54,19 @@ const DisplayResults = ({ csvData, logType }) => {
         </thead>
 
         {/* Table Body */}
-        <tbody className="divide-y divide-gray-400  ">
+        <tbody className="divide-y divide-gray-400 border-2 border-gray-400 rounded-b-lg ">
           {rows.map((row, rowIndex) => (
             <tr key={rowIndex} className="hover:bg-gray-300 transition-colors">
-              {row.map((cell, cellIndex) => (
-                <td
-                  key={cellIndex}
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-700"
-                >
-                  {cell}
-                </td>
-              ))}
+              {row
+                ? row.map((cell, cellIndex) => (
+                    <td
+                      key={cellIndex}
+                      className="px-6 py-4 text-sm text-gray-700"
+                    >
+                      {cell}
+                    </td>
+                  ))
+                : "not found"}
             </tr>
           ))}
         </tbody>

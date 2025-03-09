@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import DisplayResults from "../display/DisplayResults";
-import { getDtacResponseLogs, getDtacContactLogs } from "../api/getDtacLog";
-import { getTrueResponseLogs, getTrueContactLogs} from "../api/getTrueLog"
-import './criteria.css'
+import { getDtacResponseLogs, getDtacContactLogs } from "../api/DtacAPI";
+import { getTrueResponseLogs, getTrueContactLogs } from "../api/TrueAPI";
+import Loading from "./Loading";
+import "./criteria.css";
 
 const SearchCriteria = () => {
   // State for form inputs
@@ -21,18 +22,34 @@ const SearchCriteria = () => {
   const searchButtonRef = useRef(null);
   const resetButtonRef = useRef(null);
 
-  const handleSelectedLog = (e) => {
+  // Handle form reset
+  const handleReset = () => {
+    setStatus("");
+    setMsisdn("");
+    setDate(new Date().toISOString().split("T")[0]); // Reset to current date
+    setPackage("");
+    setCsvData("");
+    setSelectedLog("Response History"); // Reset select menu to default
+    setSelectedBrand("DTAC");
+    resetButtonRef.current.blur(); // Remove focus after click
+  };
 
+  const handleSelectedBrand = (e) => {
+    setSelectedBrand(e.target.value);
+    setCsvData("");
+  };
+
+  const handleSelectedLog = (e) => {
     setSelectedLog(e.target.value);
     setCsvData("");
   };
 
-  const handleMSISDNChange = (e) => {
-    const { value } = e.target;
-    if (value.match(/^[0-9]*$/)) {
-      setMsisdn(value);
-    }
-  };
+  // const handleMSISDNChange = (e) => {
+  //   const { value } = e.target;
+  //   if (value.match(/^[0-9]*$/)) {
+  //     setMsisdn(value);
+  //   }
+  // };
   // Set current date when the component mounts
   useEffect(() => {
     const today = new Date();
@@ -42,6 +59,7 @@ const SearchCriteria = () => {
 
   // Handle form submission
   const handleSearch = async () => {
+    setCsvData("");
     setIsLoading(true);
     setError("");
 
@@ -54,8 +72,12 @@ const SearchCriteria = () => {
       selectedBrand: selectedBrand,
     };
 
-    console.log('search param :', searchParams);
-    
+    // if (!searchParams.packageCode || searchParams.packageCode.length < 3) {
+    //   searchParams.packageCode = selectedBrand;
+    //   console.log(searchParams.packageCode);
+    // }
+
+    console.log("search param :", searchParams);
 
     try {
       let data;
@@ -80,18 +102,6 @@ const SearchCriteria = () => {
       setIsLoading(false);
       searchButtonRef.current.blur(); // Remove focus after click
     }
-  };
-
-  // Handle form reset
-  const handleReset = () => {
-    setStatus("");
-    setMsisdn("");
-    setDate(new Date().toISOString().split("T")[0]); // Reset to current date
-    setPackage("");
-    setCsvData("");
-    setSelectedLog("Response History"); // Reset select menu to default
-    setSelectedBrand("DTAC");
-    resetButtonRef.current.blur(); // Remove focus after click
   };
 
   // Function to export CSV
@@ -143,10 +153,10 @@ const SearchCriteria = () => {
   };
 
   return (
-    <div className="w-5/6 mx-auto py-8 rounded-lg nova-mono">
+    <div className="w-5/6 mx-auto py-8 rounded-lg mt-10 nova-mono">
       <form
         onSubmit={(e) => e.preventDefault()} // Prevent default form submission
-        className="bg-neutral-50 p-6 rounded-2xl shadow-md border border-gray-100"
+        className="bg-neutral-50 p-6 rounded-2xl shadow-md border-2 border-gray-200"
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>
@@ -155,8 +165,9 @@ const SearchCriteria = () => {
             </label>
             <select
               value={selectedBrand}
-              onChange={(e) => setSelectedBrand(e.target.value)}
-              className=" mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              // onChange={(e) => setSelectedBrand(e.target.value)}
+              onChange={handleSelectedBrand}
+              className=" mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-sky-400"
             >
               <option value="DTAC">DTAC</option>
               <option value="TRUE">TRUE</option>
@@ -171,7 +182,7 @@ const SearchCriteria = () => {
             <select
               value={selectedLog}
               onChange={handleSelectedLog}
-              className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-sky-400"
             >
               <option value="Response History">Response History</option>
               <option value="Contact History">Contact History</option>
@@ -187,7 +198,7 @@ const SearchCriteria = () => {
               value={status}
               // placeholder="Select Status"
               onChange={(e) => setStatus(e.target.value)}
-              className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-sky-400"
             >
               <option value="">Select Status</option>
               <option value="FULS">FULS</option>
@@ -198,16 +209,34 @@ const SearchCriteria = () => {
           {/* MSISDN Text Field */}
           <div>
             <label className="block text-balance font-semibold text-gray-700">
-              MSISDN
+              Main Search
             </label>
             <input
               required
-              maxLength={11}
+              maxLength={30}
               type="tel"
               value={msisdn}
-              onChange={handleMSISDNChange}
-              placeholder="eg. 66948078978"
-              className="required:border-red-600 required:border-2 mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => setMsisdn(e.target.value)}
+              // onChange={handleMSISDNChange}
+              // placeholder="input at least 8 letters"
+              className="required:border-red-600 required:border-2 mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1"
+            />
+          </div>
+
+          {/* Package Text Field */}
+          <div>
+            <label className="block text-balance font-semibold text-gray-700">
+              Optional Search
+            </label>
+            <input
+              // required
+              type="text"
+              value={packCode}
+              maxLength={35}
+              onChange={(e) => setPackage(e.target.value)}
+              // placeholder="input at least 3 letters"
+              className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-sky-400"
+              // className="required:border-red-600 required:border-2 mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
             />
           </div>
 
@@ -220,53 +249,57 @@ const SearchCriteria = () => {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-sky-400"
             />
           </div>
-
-          {/* Package Text Field */}
-          <div>
-            <label className="block text-balance font-semibold text-gray-700">
-              Package
-            </label>
-            <input
-              type="text"
-              value={packCode}
-              onChange={(e) => setPackage(e.target.value)}
-              placeholder="Package Code"
-              className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          <span className="text-xs text-red-500">
+            Plase input the required fields
+          </span>
         </div>
 
         {/* Submit Button */}
-        <div className="mt-6">
-          {msisdn && msisdn.length >= 4 ? (
+        <div className="flex flex-row mt-6">
+          {msisdn ? (
             <button
               ref={searchButtonRef}
               onClick={handleSearch}
               disabled={isLoading}
               type="submit" // Use type="button" to prevent form submission
-              className="w-full sm:w-auto px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              // className="w-full sm:w-auto px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full sm:w-auto px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg hover:from-blue-400 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              {isLoading ? "Searching..." : "Search"}
+              {isLoading ? (
+                <div className="flex flex-row">
+                  <div role="status">
+                    <Loading />
+                  </div>
+                  <span className="ml-1"> Searching...</span>
+                </div>
+              ) : (
+                "Search"
+              )}
             </button>
           ) : (
             ""
           )}
-          <button
-            ref={resetButtonRef}
-            onClick={handleReset}
-            type="button"
-            className="ml-2 w-full sm:w-auto px-6 py-2 bg-red-500 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-          >
-            Reset
-          </button>
+          {!isLoading ? (
+            <button
+              ref={resetButtonRef}
+              onClick={handleReset}
+              type="button"
+              // className="ml-2 w-full sm:w-auto px-6 py-2 bg-red-500 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="ml-2 w-full sm:w-auto px-6 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 hover:from-pink-400 hover:to-rose-600"
+            >
+              Reset
+            </button>
+          ) : (
+            ""
+          )}
 
-          {csvData ? (
+          {csvData && !isLoading ? (
             <button
               onClick={exportToCSV}
-              className="ml-2 w-full sm:w-auto px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="ml-2 w-full sm:w-auto px-6 py-2 bg-gradient-to-r from-slate-900 to-slate-700 text-white rounded-lg hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-500 hover:from-slate-400 hover:to-slate-600"
             >
               Export as CSV
             </button>
@@ -276,7 +309,7 @@ const SearchCriteria = () => {
         </div>
       </form>
 
-      <div>
+      <div className="justify-items-center"> 
         {error && <p className="mt-4 text-red-500">{error}</p>}
         {csvData && (
           <div className="mt-6">

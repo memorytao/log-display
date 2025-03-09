@@ -5,6 +5,17 @@
     font-style: normal;
 }
 
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spin {
+    transform-origin: center;
+    animation: spin 1.1s linear infinite;
+}
+
 
 .nova-mono {
     font-family: 'NovaMono', monospace;

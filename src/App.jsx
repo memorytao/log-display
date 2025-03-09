@@ -15,8 +15,7 @@ function App() {
 
   return (
     <div className={animate}>
-      <div
-        className="bg-gradient-to-t from-[#7189bf] via-[#df7599] to-[#ffc785] w-full h-lvh">
+      <div className="bg-white w-screen max-h-screen">
         <SearchCriteria />
       </div>
     </div>
