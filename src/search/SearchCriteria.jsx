@@ -1,16 +1,17 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import DisplayResults from "../display/DisplayResults";
 import { getDtacResponseLogs, getDtacContactLogs } from "../api/DtacAPI";
 import { getTrueResponseLogs, getTrueContactLogs } from "../api/TrueAPI";
 import Loading from "./Loading";
 import "./criteria.css";
+import { IoIosArrowDropdownCircle } from "react-icons/io";
 
 const SearchCriteria = () => {
   // State for form inputs
   const [status, setStatus] = useState("");
-  const [msisdn, setMsisdn] = useState("");
-  const [date, setDate] = useState("");
-  const [packCode, setPackage] = useState("");
+  const [mainSearch, setMainSearch] = useState("");
+  const [sorting, setSorting] = useState("latest");
+  const [optionalSearch, setOptionalSearch] = useState("");
   const [selectedLog, setSelectedLog] = useState("Response History"); // State for select log
   const [selectedBrand, setSelectedBrand] = useState("DTAC"); // State for select brand
 
@@ -25,9 +26,9 @@ const SearchCriteria = () => {
   // Handle form reset
   const handleReset = () => {
     setStatus("");
-    setMsisdn("");
-    setDate(new Date().toISOString().split("T")[0]); // Reset to current date
-    setPackage("");
+    setMainSearch("");
+    setSorting("latest");
+    setOptionalSearch("");
     setCsvData("");
     setSelectedLog("Response History"); // Reset select menu to default
     setSelectedBrand("DTAC");
@@ -44,19 +45,6 @@ const SearchCriteria = () => {
     setCsvData("");
   };
 
-  // const handleMSISDNChange = (e) => {
-  //   const { value } = e.target;
-  //   if (value.match(/^[0-9]*$/)) {
-  //     setMsisdn(value);
-  //   }
-  // };
-  // Set current date when the component mounts
-  useEffect(() => {
-    const today = new Date();
-    const formattedDate = today.toISOString().split("T")[0]; // Format as YYYY-MM-DD
-    setDate(formattedDate); // Set the current date
-  }, []);
-
   // Handle form submission
   const handleSearch = async () => {
     setCsvData("");
@@ -65,19 +53,14 @@ const SearchCriteria = () => {
 
     const searchParams = {
       status: status,
-      msisdn: msisdn,
-      date: date,
-      packageCode: packCode,
+      mainSearch: mainSearch.trim(),
+      sort: sorting,
+      optionalSearch: optionalSearch.trim(),
       selectedLog: selectedLog,
       selectedBrand: selectedBrand,
     };
 
-    // if (!searchParams.packageCode || searchParams.packageCode.length < 3) {
-    //   searchParams.packageCode = selectedBrand;
-    //   console.log(searchParams.packageCode);
-    // }
-
-    console.log("search param :", searchParams);
+    // console.log("search param :", searchParams);
 
     try {
       let data;
@@ -163,30 +146,42 @@ const SearchCriteria = () => {
             <label className="block text-balance font-semibold text-gray-700 ">
               Brand
             </label>
-            <select
-              value={selectedBrand}
-              // onChange={(e) => setSelectedBrand(e.target.value)}
-              onChange={handleSelectedBrand}
-              className=" mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-sky-400"
-            >
-              <option value="DTAC">DTAC</option>
-              <option value="TRUE">TRUE</option>
-            </select>
+            <div className="relative">
+              <select
+                value={selectedBrand}
+                onChange={handleSelectedBrand}
+                className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-400 appearance-none"
+              >
+                <option value="DTAC">DTAC</option>
+                <option value="TRUE">TRUE</option>
+              </select>
+              {/* Custom dropdown arrow using react-icons */}
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <IoIosArrowDropdownCircle className="h-5 w-5 text-gray-700" />
+              </div>
+            </div>
           </div>
 
           {/* Select Menu */}
+
           <div>
             <label className="block text-balance font-semibold text-gray-700">
               Logs
             </label>
-            <select
-              value={selectedLog}
-              onChange={handleSelectedLog}
-              className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-sky-400"
-            >
-              <option value="Response History">Response History</option>
-              <option value="Contact History">Contact History</option>
-            </select>
+            <div className="relative">
+              <select
+                value={selectedLog}
+                onChange={handleSelectedLog}
+                className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-400 appearance-none"
+              >
+                <option value="Response History">Response History</option>
+                <option value="Contact History">Contact History</option>
+              </select>
+              {/* Custom dropdown arrow using react-icons */}
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <IoIosArrowDropdownCircle className="h-5 w-5 text-gray-700" />
+              </div>
+            </div>
           </div>
 
           {/* Status Dropdown */}
@@ -194,36 +189,50 @@ const SearchCriteria = () => {
             <label className="block text-balance font-semibold text-gray-700">
               Status
             </label>
-            <select
-              value={status}
-              // placeholder="Select Status"
-              onChange={(e) => setStatus(e.target.value)}
-              className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-sky-400"
-            >
-              <option value="">Select Status</option>
-              <option value="FULS">FULS</option>
-              <option value="FULF">FULF</option>
-            </select>
+            <div className="relative">
+              <select
+                value={status}
+                // placeholder="Select Status"
+                onChange={(e) => setStatus(e.target.value)}
+                className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-400 appearance-none"
+              >
+                <option value="">Select Status</option>
+                <option value="FULS">FULS</option>
+                <option value="FULF">FULF</option>
+                <option value="SUCCESS">SUCCESS</option>
+                <option value="Success">Success</option>
+              </select>
+              {/* Custom dropdown arrow using react-icons */}
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <IoIosArrowDropdownCircle className="h-5 w-5 text-gray-700" />
+              </div>
+            </div>
           </div>
 
-          {/* MSISDN Text Field */}
+          {/* MAIN Text Search */}
           <div>
             <label className="block text-balance font-semibold text-gray-700">
               Main Search
             </label>
-            <input
-              required
-              maxLength={30}
-              type="tel"
-              value={msisdn}
-              onChange={(e) => setMsisdn(e.target.value)}
-              // onChange={handleMSISDNChange}
-              // placeholder="input at least 8 letters"
-              className="required:border-red-600 required:border-2 mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1"
-            />
+            <div className="relative">
+              <input
+                required
+                maxLength={30}
+                type="tel"
+                value={mainSearch}
+                onChange={(e) => setMainSearch(e.target.value)}
+                className="required:border-red-600 required:border-2 mt-1 block w-full px-4 py-2 rounded-lg focus:outline focus:outline-pink-400"
+              />
+              <span className="absolute top-0 right-0 transform -translate-y-1/2 translate-x-1/2">
+                <span className="relative flex size-3">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75"></span>
+                  <span className="relative inline-flex size-3 rounded-full bg-rose-600"></span>
+                </span>
+              </span>
+            </div>
           </div>
 
-          {/* Package Text Field */}
+          {/* Optional Text Search */}
           <div>
             <label className="block text-balance font-semibold text-gray-700">
               Optional Search
@@ -231,35 +240,41 @@ const SearchCriteria = () => {
             <input
               // required
               type="text"
-              value={packCode}
+              value={optionalSearch}
               maxLength={35}
-              onChange={(e) => setPackage(e.target.value)}
-              // placeholder="input at least 3 letters"
-              className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-sky-400"
-              // className="required:border-red-600 required:border-2 mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
+              onChange={(e) => setOptionalSearch(e.target.value)}
+              className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-400"
             />
           </div>
 
-          {/* Date Input */}
+          {/* Sort by oldest/newest data */}
           <div>
             <label className="block text-balance font-semibold text-gray-700">
-              Date
+              Sort By
             </label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-sky-400"
-            />
+            <div className="relative">
+              <select
+                value={sorting}
+                onChange={(e) => setSorting(e.target.value)}
+                className=" mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-400 appearance-none"
+              >
+                <option value="latest">Latest</option>
+                <option value="oldest">Oldest</option>
+              </select>
+              {/* Custom dropdown arrow using react-icons */}
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <IoIosArrowDropdownCircle className="h-5 w-5 text-gray-700" />
+              </div>
+            </div>
           </div>
-          <span className="text-xs text-red-500">
-            Plase input the required fields
-          </span>
+          {/* <span className="text-xs text-red-500">
+            Please input the required field first
+          </span> */}
         </div>
 
         {/* Submit Button */}
         <div className="flex flex-row mt-6">
-          {msisdn ? (
+          {mainSearch ? (
             <button
               ref={searchButtonRef}
               onClick={handleSearch}
@@ -309,7 +324,7 @@ const SearchCriteria = () => {
         </div>
       </form>
 
-      <div className="justify-items-center"> 
+      <div className="justify-items-center">
         {error && <p className="mt-4 text-red-500">{error}</p>}
         {csvData && (
           <div className="mt-6">

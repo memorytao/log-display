@@ -9,9 +9,9 @@ export const getTrueResponseLogs = async (searchTerm) => {
       },
       body: JSON.stringify({
         status: searchTerm.status,
-        msisdn: searchTerm.msisdn,
-        date: searchTerm.date,
-        packageCode: searchTerm.packageCode,
+        mainSearch: searchTerm.mainSearch,
+        sort: searchTerm.sort,
+        optionalSearch: searchTerm.optionalSearch,
       }),
     });
 
@@ -36,9 +36,9 @@ export const getTrueContactLogs = async (searchTerm) => {
       },
       body: JSON.stringify({
         status: searchTerm.status,
-        msisdn: searchTerm.msisdn,
-        date: searchTerm.date,
-        packageCode: searchTerm.packageCode,
+        mainSearch: searchTerm.mainSearch,
+        sort: searchTerm.sort,
+        optionalSearch: searchTerm.optionalSearch,
       }),
     });
 

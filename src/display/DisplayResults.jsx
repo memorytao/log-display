@@ -37,7 +37,7 @@ const DisplayResults = ({ csvData, logType }) => {
   });
 
   return (
-    <div className="overflow-x-auto max-w-screen-2xl min-w-0 mt-10 h-120 max-h-screen rounded-2xl mx-auto mb-auto border-l-10 border-l-gray-300  border-b-15 border-b-gray-300 border-r-12 border-r-gray-300">
+    <div className="overflow-x-auto max-w-400 min-w-3xl mt-10 min-h-auto max-h-120 rounded-2xl mx-auto mb-auto border-l-10 border-l-gray-300  border-b-15 border-b-gray-300 border-r-12 border-r-gray-300">
       <table className="bg-white">
         {/* Table Header */}
         <thead className="h-15 max-h-150 bg-gradient-to-b from-gray-900 to-gray-700">
