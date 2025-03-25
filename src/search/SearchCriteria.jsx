@@ -221,14 +221,22 @@ const SearchCriteria = () => {
                 type="tel"
                 value={mainSearch}
                 onChange={(e) => setMainSearch(e.target.value)}
-                className="required:border-red-600 required:border-2 mt-1 block w-full px-4 py-2 rounded-lg focus:outline focus:outline-pink-400"
+                className={
+                  !mainSearch
+                    ? "required:border-red-600 required:border-2 mt-1 block w-full px-4 py-2 rounded-lg focus:outline focus:outline-pink-400"
+                    : "mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                }
               />
-              <span className="absolute top-0 right-0 transform -translate-y-1/2 translate-x-1/2">
-                <span className="relative flex size-3">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75"></span>
-                  <span className="relative inline-flex size-3 rounded-full bg-rose-600"></span>
+              {!mainSearch ? (
+                <span className="absolute top-0 right-0 transform -translate-y-1/2 translate-x-1/2">
+                  <span className="relative flex size-3">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75"></span>
+                    <span className="relative inline-flex size-3 rounded-full bg-rose-600"></span>
+                  </span>
                 </span>
-              </span>
+              ) : (
+                ""
+              )}
             </div>
           </div>
 
