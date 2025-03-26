@@ -119,7 +119,7 @@ const SearchCriteria = () => {
     });
 
     // Convert the data rows to CSV format (without headers)
-    const csvContent = rows.map((row) => row.join(",")).join("\n");
+    const csvContent = rows.map((row) => row.join("|")).join("\n");
 
     // Create a Blob from the CSV content
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -136,10 +136,10 @@ const SearchCriteria = () => {
   };
 
   return (
-    <div className="w-5/6 mx-auto py-8 rounded-lg mt-10 nova-mono">
+    <div className="w-5/6 mx-auto py-8 rounded-lg nova-mono">
       <form
         onSubmit={(e) => e.preventDefault()} // Prevent default form submission
-        className="bg-neutral-50 p-6 rounded-2xl shadow-md border-2 border-gray-200"
+        className="bg-gray-200 p-6 rounded-2xl border-2 border-gray-200 shadow-[0px_4px_70px_14px_rgba(147,_51,_234,0.5)]"
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>

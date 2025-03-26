@@ -1,6 +1,7 @@
 // import Header from "./headers/Header";
 import SearchCriteria from "./search/SearchCriteria";
 import { useEffect, useState } from "react";
+import "./App.css";
 
 function App() {
   const [animate, setAnimate] = useState("animate-bounce");
@@ -14,11 +15,11 @@ function App() {
   }, []);
 
   return (
-    <div className={animate}>
-      <div className="bg-white w-screen max-h-screen">
+    // <div className={animate}>
+      <div className={`${animate} main-bg w-full h-svh pt-10`}>
         <SearchCriteria />
       </div>
-    </div>
+    // </div>
   );
 }
 
