@@ -5,6 +5,9 @@ import { getTrueResponseLogs, getTrueContactLogs } from "../api/TrueAPI";
 import Loading from "./Loading";
 import "./criteria.css";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
+import { LuDownload } from "react-icons/lu";
+
+
 
 const SearchCriteria = () => {
   // State for form inputs
@@ -139,7 +142,7 @@ const SearchCriteria = () => {
     <div className="w-5/6 mx-auto py-8 rounded-lg nova-mono">
       <form
         onSubmit={(e) => e.preventDefault()} // Prevent default form submission
-        className="bg-gray-200 p-6 rounded-2xl border-2 border-gray-200 shadow-[0px_4px_70px_14px_rgba(147,_51,_234,0.5)]"
+        className="bg-gray-200 p-6 rounded-2xl border-2 border-gray-200 shadow-[0px_9px_45px_22px_rgba(255,_26,117,_0.5)]"
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>
@@ -324,8 +327,9 @@ const SearchCriteria = () => {
               onClick={exportToCSV}
               className="ml-2 w-full sm:w-auto px-6 py-2 bg-gradient-to-r from-slate-900 to-slate-700 text-white rounded-lg hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-500 hover:from-slate-400 hover:to-slate-600"
             >
-              Export as CSV
+              <LuDownload />
             </button>
+           
           ) : (
             ""
           )}

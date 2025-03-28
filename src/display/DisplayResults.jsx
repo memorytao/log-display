@@ -40,12 +40,12 @@ const DisplayResults = ({ csvData, logType }) => {
     <div className="overflow-x-auto max-w-400 min-w-3xl mt-20 min-h-auto max-h-120 rounded-2xl mx-auto mb-auto border-l-10 border-l-gray-300  border-b-15 border-b-gray-300 border-r-12 border-r-gray-300">
       <table className="bg-white">
         {/* Table Header */}
-        <thead className="h-15 max-h-150 bg-gradient-to-b from-gray-900 to-gray-700">
+        <thead className="h-15 max-h-150 bg-gradient-to-b from-gray-900 to-gray-700 sticky top-0">
           <tr>
             {COLUMNS.map((column, index) => (
               <th
                 key={index}
-                className="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300 "
+                className="px-6 py-3 text-left text-base font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300 "
               >
                 {column}
               </th>
@@ -61,7 +61,7 @@ const DisplayResults = ({ csvData, logType }) => {
                 ? row.map((cell, cellIndex) => (
                     <td
                       key={cellIndex}
-                      className="px-6 py-4 text-sm text-gray-700"
+                      className="antialiased font-normal px-6 py-4 text-sm text-gray-700"
                     >
                       {cell}
                     </td>
