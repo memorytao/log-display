@@ -63,8 +63,6 @@ const SearchCriteria = () => {
       selectedBrand: selectedBrand,
     };
 
-    // console.log("search param :", searchParams);
-
     try {
       let data;
       if (selectedBrand === "DTAC") {
