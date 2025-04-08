@@ -17,7 +17,20 @@ COPY . .
 RUN npm run build
 
 # Expose the port the app runs on
-EXPOSE 3000
+# EXPOSE 3000
 
 # Define the command to run the app
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]
+# CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]
+
+# Use an official nginx image
+FROM nginx:alpine
+
+# Copy the build files to nginx's default public folder
+COPY dist/ /usr/share/nginx/html
+
+# Optional: copy your custom nginx config
+COPY nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 3000
+
+CMD ["nginx", "-g", "daemon off;"]
