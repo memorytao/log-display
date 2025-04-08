@@ -1,13 +1,10 @@
-import { useState, useRef } from "react";
-import DisplayResults from "../display/DisplayResults";
-import { getDtacResponseLogs, getDtacContactLogs } from "../api/DtacAPI";
-import { getTrueResponseLogs, getTrueContactLogs } from "../api/TrueAPI";
-import Loading from "./Loading";
-import "./criteria.css";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import { LuDownload } from "react-icons/lu";
-
-
+import DisplayResults from "../display/DisplayResults";
+import "./criteria.css";
+import { getDtacContactLogs, getDtacResponseLogs } from "../api/DtacAPI";
+import { getTrueContactLogs, getTrueResponseLogs } from "../api/TrueAPI";
 
 const SearchCriteria = () => {
   // State for form inputs
@@ -15,44 +12,63 @@ const SearchCriteria = () => {
   const [mainSearch, setMainSearch] = useState("");
   const [sorting, setSorting] = useState("latest");
   const [optionalSearch, setOptionalSearch] = useState("");
-  const [selectedLog, setSelectedLog] = useState("Response History"); // State for select log
-  const [selectedBrand, setSelectedBrand] = useState("DTAC"); // State for select brand
-
-  const [csvData, setCsvData] = useState("");
+  const [selectedLog, setSelectedLog] = useState("Response History");
+  const [selectedBrand, setSelectedBrand] = useState("DTAC");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [searchResults, setSearchResults] = useState(null);
+  const abortControllerRef = useRef(null);
 
-  // Refs for buttons
-  const searchButtonRef = useRef(null);
-  const resetButtonRef = useRef(null);
+  const keepResults = useMemo(() => {
+    return searchResults &&
+      searchResults.response &&
+      searchResults.response.length > 0
+      ? searchResults
+      : null;
+  }, [searchResults]);
 
-  // Handle form reset
+  useEffect(() => {
+    return () => {
+      // Cleanup on unmount
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
   const handleReset = () => {
     setStatus("");
     setMainSearch("");
     setSorting("latest");
     setOptionalSearch("");
-    setCsvData("");
-    setSelectedLog("Response History"); // Reset select menu to default
+    setSelectedLog("Response History");
     setSelectedBrand("DTAC");
-    resetButtonRef.current.blur(); // Remove focus after click
+    setIsLoading(false);
+    setError("");
+    setSearchResults(null);
   };
 
   const handleSelectedBrand = (e) => {
     setSelectedBrand(e.target.value);
-    setCsvData("");
   };
 
   const handleSelectedLog = (e) => {
     setSelectedLog(e.target.value);
-    setCsvData("");
   };
 
-  // Handle form submission
   const handleSearch = async () => {
-    setCsvData("");
+    // Cancel any pending requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    // Create new AbortController for this request
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
     setIsLoading(true);
     setError("");
+    setSearchResults(null);
 
     const searchParams = {
       status: status,
@@ -63,58 +79,50 @@ const SearchCriteria = () => {
       selectedBrand: selectedBrand,
     };
 
-    // console.log("search param :", searchParams);
-
     try {
-      let data;
+      let response;
       if (selectedBrand === "DTAC") {
-        if (selectedLog === "Response History") {
-          data = await getDtacResponseLogs(searchParams); // Use the API function
-        } else {
-          data = await getDtacContactLogs(searchParams); // Use the API function
-        }
+        response =
+          selectedLog === "Response History"
+            ? await getDtacResponseLogs(searchParams, { signal })
+            : await getDtacContactLogs(searchParams, { signal });
       } else {
-        if (selectedLog === "Response History") {
-          data = await getTrueResponseLogs(searchParams); // Use the API function
-        } else {
-          data = await getTrueContactLogs(searchParams); // Use the API function
-        }
+        response =
+          selectedLog === "Response History"
+            ? await getTrueResponseLogs(searchParams, { signal })
+            : await getTrueContactLogs(searchParams, { signal });
       }
-      setCsvData(data);
+
+      if (!signal.aborted) {
+        await new Promise((resolve) => {
+          setTimeout(() => {
+            const processedData =
+              typeof response === "string" ? JSON.parse(response) : response;
+            setSearchResults(processedData);
+            resolve(); // Resolve after timeout + data processing
+          }, 1500);
+        });
+      }
     } catch (err) {
-      setError("An error occurred while fetching data.");
-      console.error(err);
+      if (!signal.aborted) {
+        setError(err.message || "Failed to fetch data");
+      }
     } finally {
-      setIsLoading(false);
-      searchButtonRef.current.blur(); // Remove focus after click
+      if (!signal.aborted) {
+        setIsLoading(false);
+      }
     }
   };
 
-  // Function to export CSV
   const exportToCSV = () => {
-    if (!csvData) {
-      alert("No data to export!");
-      return;
-    }
-
-    // Parse the JSON string
-    let parsedData;
-    try {
-      parsedData = JSON.parse(csvData);
-    } catch (error) {
-      console.error("Failed to parse csvData:", error);
-      alert("Failed to export data. Invalid data format.");
-      return;
-    }
-
     // Check if parsedData or parsedData.response is undefined
-    if (!parsedData || !parsedData.response) {
-      alert("No data available to export.");
+    if (!searchResults || !searchResults.response) {
+      setError("No data available to export.");
       return;
     }
 
     // Process each item in the response array
-    const rows = parsedData.response.flatMap((item) => {
+    const rows = searchResults.response.flatMap((item) => {
       return item.data.map((dataString) => {
         const columns = dataString.split("|"); // Split the pipe-separated string
         return [...columns, item.machine]; // Add the machine field to the row
@@ -136,6 +144,31 @@ const SearchCriteria = () => {
     link.click(); // Trigger the download
     document.body.removeChild(link); // Clean up
     URL.revokeObjectURL(url); // Free up memory
+  };
+
+  const Loading = () => {
+    return (
+      <svg
+        className="animate-spin h-5 w-5 text-white"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        ></circle>
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8v8H4z"
+        ></path>
+      </svg>
+    );
   };
 
   return (
@@ -225,9 +258,9 @@ const SearchCriteria = () => {
                 value={mainSearch}
                 onChange={(e) => setMainSearch(e.target.value)}
                 className={
-                  !mainSearch
-                    ? "required:border-red-600 required:border-2 mt-1 block w-full px-4 py-2 rounded-lg focus:outline focus:outline-pink-400"
-                    : "mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                  mainSearch
+                    ? "mt-1 block w-full px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                    : "mt-1 block w-full px-4 py-2 border border-red-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-pink-400"
                 }
               />
               {!mainSearch ? (
@@ -285,19 +318,18 @@ const SearchCriteria = () => {
 
         {/* Submit Button */}
         <div className="flex flex-row mt-6">
-          {mainSearch ? (
+          {mainSearch && (
             <button
-              ref={searchButtonRef}
               onClick={handleSearch}
               disabled={isLoading}
-              type="submit" // Use type="button" to prevent form submission
-              // className="w-full sm:w-auto px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="submit"
               className="w-full sm:w-auto px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg hover:from-blue-400 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {isLoading ? (
                 <div className="flex flex-row">
                   <div role="status">
                     <Loading />
+                    <span className="sr-only">Loading...</span>
                   </div>
                   <span className="ml-1"> Searching...</span>
                 </div>
@@ -305,43 +337,33 @@ const SearchCriteria = () => {
                 "Search"
               )}
             </button>
-          ) : (
-            ""
           )}
-          {!isLoading ? (
+
+          {!isLoading && (
             <button
-              ref={resetButtonRef}
               onClick={handleReset}
               type="button"
-              // className="ml-2 w-full sm:w-auto px-6 py-2 bg-red-500 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               className="ml-2 w-full sm:w-auto px-6 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 hover:from-pink-400 hover:to-rose-600"
             >
               Reset
             </button>
-          ) : (
-            ""
           )}
 
-          {csvData && !isLoading ? (
+          {searchResults && !isLoading && (
             <button
               onClick={exportToCSV}
               className="ml-2 w-full sm:w-auto px-6 py-2 bg-gradient-to-r from-slate-900 to-slate-700 text-white rounded-lg hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-500 hover:from-slate-400 hover:to-slate-600"
             >
               <LuDownload />
             </button>
-           
-          ) : (
-            ""
           )}
         </div>
       </form>
 
       <div className="justify-items-center">
-        {error && <p className="mt-4 text-red-500">{error}</p>}
-        {csvData && (
-          <div className="mt-6">
-            <DisplayResults csvData={csvData} logType={selectedLog} />
-          </div>
+        {error && <p className="mt-20 text-red-500">{error}</p>}
+        {keepResults && (
+          <DisplayResults data={keepResults} logType={selectedLog} />
         )}
       </div>
     </div>
