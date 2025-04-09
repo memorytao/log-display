@@ -1,5 +1,5 @@
 # Use an official Node.js runtime as a parent image
-FROM node:current-alpine
+FROM node:current-alpine AS builder
 
 # Set the working directory
 WORKDIR /gui_app
@@ -26,6 +26,7 @@ RUN npm run build
 FROM nginx:alpine
 
 # Copy the build files to nginx's default public folder
+COPY --from=builder /gui_app/dist /usr/share/nginx/html
 COPY dist/ /usr/share/nginx/html
 
 # Optional: copy your custom nginx config
